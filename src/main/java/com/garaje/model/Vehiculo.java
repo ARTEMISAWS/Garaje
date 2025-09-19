@@ -7,6 +7,7 @@ public class Vehiculo {
     private String modelo;
     private String color;
     private String propietario;
+    private String año;
 
     /** Constructor vacío (requerido por JavaBeans) */
     public Vehiculo() { }

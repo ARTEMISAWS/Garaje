@@ -19,6 +19,9 @@ import jakarta.servlet.http.HttpServletResponse;
  
 @WebServlet("/vehiculos")
 public class VehiculoServlet extends HttpServlet {
-    // ... métodos con JavaDoc para GET, POST ...
+    
+    
+    
+    // ... métodos con JavaDoc para GET, POST ...   system.out.print
 }
  
