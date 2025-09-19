@@ -5,7 +5,7 @@
     <artifactId>Garaje</artifactId>
     <version>1.0-SNAPSHOT</version>
     <packaging>war</packaging>
-    <name>Garaje-1.0-SNAPSHOT</name>
+    <name>Garas-1.0-SNAPSHOT</name>
     
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
