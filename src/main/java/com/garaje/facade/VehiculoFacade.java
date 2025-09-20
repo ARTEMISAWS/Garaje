@@ -20,7 +20,7 @@ import java.util.List;
 @Stateless
 public class VehiculoFacade {
 
-    @Resource(lookup = "jdbc/myPool")
+    @Resource(lookup = "jdbc/garajeDB")
     private DataSource ds;
 
     /**
