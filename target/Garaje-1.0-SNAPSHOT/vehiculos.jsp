@@ -19,49 +19,44 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Garaje</title>
+    
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; background-color: #f4f7f9; color: #333; margin: 0; padding: 20px; }
-        .container { max-width: 900px; margin: 20px auto; background: #fff; padding: 25px; border-radius: 8px; box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); }
-        h1, h2 { color: #2c3e50; text-align: center; }
-        h1 { margin-bottom: 10px; }
-        h2 { margin-bottom: 20px; border-bottom: 2px solid #ecf0f1; padding-bottom: 10px; }
-        .form-container { background-color: #ecf0f1; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
-        .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .form-group { display: flex; flex-direction: column; }
-        label { font-weight: 600; margin-bottom: 5px; font-size: 14px; }
+        body { font-family: sans-serif; background-color: #f9f9f9; padding: 15px; }
+        .container { max-width: 800px; margin: auto; background: #fff; border: 1px solid #ccc; padding: 20px; }
+        h1, h2 { text-align: center; color: #333; border-bottom: 1px solid #eee; padding-bottom: 10px; margin-bottom: 20px;}
+        .form-group { margin-bottom: 15px; }
+        label { display: block; font-weight: bold; margin-bottom: 5px; }
         input[type="text"], input[type="number"], select {
-            padding: 10px; border: 1px solid #bdc3c7; border-radius: 4px; font-size: 16px;
-            transition: border-color 0.3s;
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ccc;
+            box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
         }
-        input:focus { border-color: #3498db; outline: none; }
         .btn {
-            padding: 10px 15px; border: none; border-radius: 4px; font-size: 16px;
-            cursor: pointer; color: white; text-decoration: none; display: inline-block; text-align: center;
+            padding: 10px 15px; border: none; font-size: 16px;
+            cursor: pointer; color: white; text-decoration: none;
         }
-        .btn-primary { background-color: #3498db; }
-        .btn-success { background-color: #2ecc71; }
-        .btn-warning { background-color: #f1c40f; }
-        .btn-danger { background-color: #e74c3c; }
-        .btn-secondary { background-color: #95a5a6; }
+        .btn-primary { background-color: #007bff; }
+        .btn-success { background-color: #28a745; }
+        .btn-warning { background-color: #ffc107; }
+        .btn-danger { background-color: #dc3545; }
+        .btn-secondary { background-color: #6c757d; }
         .form-actions { margin-top: 20px; text-align: right; }
         .alert {
-            padding: 15px; margin-bottom: 20px; border-radius: 4px;
-            font-weight: bold; text-align: center;
+            padding: 15px; margin-bottom: 20px; border: 1px solid;
         }
-        .alert-danger { background-color: #e74c3c; color: white; }
-        .alert-success { background-color: #2ecc71; color: white; }
+        .alert-danger { background-color: #f8d7da; border-color: #f5c6cb; color: #721c24; }
+        .alert-success { background-color: #d4edda; border-color: #c3e6cb; color: #155724; }
         table { width: 100%; border-collapse: collapse; margin-top: 20px; }
-        th, td { padding: 12px; border: 1px solid #ddd; text-align: left; }
-        th { background-color: #34495e; color: white; }
-        tr:nth-child(even) { background-color: #f2f2f2; }
-        tr:hover { background-color: #ecf0f1; }
+        th, td { padding: 8px; border: 1px solid #ddd; text-align: left; }
+        th { background-color: #f2f2f2; }
         .actions-cell { text-align: center; }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>🚗 Gestión de Garaje</h1>
+    <h1>Gestión de Garaje</h1>
 
     <%-- Sección para mostrar mensajes de error o éxito --%>
     <c:if test="${not empty error}">
@@ -72,15 +67,12 @@
     </c:if>
 
     <div class="form-container">
-        <h2><%= modoEdicion ? "📝 Editando Vehículo" : "➕ Registrar Nuevo Vehículo" %></h2>
+        <h2><%= modoEdicion ? " Editando Vehículo" : "Registrar Nuevo Vehículo" %></h2>
         
-        <%-- El formulario envía los datos al servlet 'vehiculos' --%>
         <form action="vehiculos" method="post">
             
-            <%-- Campo oculto para manejar la acción (agregar o actualizar) --%>
             <input type="hidden" name="action" value="<%= modoEdicion ? "update" : "add" %>">
             
-            <%-- Si estamos en modo edición, incluimos el ID del vehículo --%>
             <c:if test="${modoEdicion}">
                 <input type="hidden" name="id" value="${vehiculoSeleccionado.id}">
             </c:if>
@@ -96,7 +88,15 @@
                 </div>
                 <div class="form-group">
                     <label for="modelo">Modelo (Año)</label>
-                    
+                    <%-- Se usa c:choose para generar el HTML limpio y evitar errores de validación del IDE --%>
+                    <c:choose>
+                        <c:when test="${modoEdicion}">
+                            <input type="number" id="modelo" name="modelo" value="${vehiculoSeleccionado.modelo}" required placeholder="Ej: 2023">
+                        </c:when>
+                        <c:otherwise>
+                            <input type="number" id="modelo" name="modelo" required placeholder="Ej: 2023">
+                        </c:otherwise>
+                    </c:choose>
                 </div>
                 <div class="form-group">
                     <label for="color">Color</label>
@@ -118,7 +118,7 @@
 
             <div class="form-actions">
                 <c:if test="${modoEdicion}">
-                    <a href="vehiculos" class="btn btn-secondary">Cancelar Edición</a>
+                    <a href="vehiculos" class="btn btn-secondary">Cancelar</a>
                 </c:if>
                 <button type="submit" class="btn <%= modoEdicion ? "btn-success" : "btn-primary" %>">
                     <%= modoEdicion ? "Actualizar Vehículo" : "Agregar Vehículo" %>
@@ -127,7 +127,7 @@
         </form>
     </div>
 
-    <h2>📋 Listado de Vehículos</h2>
+    <h2>Listado de Vehículos</h2>
     <table>
         <thead>
             <tr>

@@ -13,10 +13,7 @@ import java.time.Year; // Import para obtener el año actual
 import java.util.Arrays;
 import java.util.List;
 
-/**
- * Fachada para operaciones sobre vehículos. 
- * Se implementan las reglas de negocio antes de llamar al DAO.
- */
+
 @Stateless
 public class VehiculoFacade {
 

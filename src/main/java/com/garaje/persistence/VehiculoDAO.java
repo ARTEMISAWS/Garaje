@@ -27,28 +27,43 @@ public class VehiculoDAO {
      * @throws SQLException si hay error de conexión BID.
      */
     public List<Vehiculo> listar() throws SQLException {
-        List<Vehiculo> lista = new ArrayList<>();
-        String sql = "SELECT * FROM vehiculos";
-        try (Statement st = con.createStatement(); ResultSet rs = st.executeQuery(sql)) {
-            while (rs.next()) {
-                Vehiculo v = new Vehiculo(
-                        rs.getInt("id"),
-                        rs.getString("placa"),
-                        rs.getString("marca"),
-                        rs.getString("modelo"),
-                        rs.getString("color"),
-                        rs.getString("propietario")
-                );
-                lista.add(v);
-            }
-        } catch (SQLException ex) {
-            // Manejo de error: loggear el error y relanzar
-            System.err.println("Error al listar vehículos: "
-                    + ex.getMessage());
-            throw ex; // relanzar para manejar en capa superior
+    List<Vehiculo> lista = new ArrayList<>();
+    String sql = "SELECT * FROM vehiculos";
+    
+    
+    System.out.println(" INICIANDO DAO: listar()");
+    
+    System.out.println("DAO: Intentando ejecutar la consulta: " + sql);
+
+    try (Statement st = con.createStatement();
+         ResultSet rs = st.executeQuery(sql)) {
+
+        int contador = 0;
+        while (rs.next()) {
+            System.out.println("DAO: Encontrado vehículo ID: " + rs.getInt("id") + ", Placa: " + rs.getString("placa"));
+            contador++;
+            Vehiculo v = new Vehiculo(
+                rs.getInt("id"),
+                rs.getString("placa"),
+                rs.getString("marca"),
+                rs.getString("modelo"),
+                rs.getString("color"),
+                rs.getString("propietario")
+            );
+            lista.add(v);
         }
-        return lista;
+        
+        // --- MENSAJE DE DEPURACIÓN 2 ---
+        System.out.println("DAO: Consulta finalizada. Se encontraron " + contador + " vehículos.");
+
+    } catch (SQLException ex) {
+        // --- MENSAJE DE DEPURACIÓN 3 (MUY IMPORTANTE) ---
+        System.err.println("DAO: ¡ERROR GRAVE AL EJECUTAR LA CONSULTA!");
+        ex.printStackTrace(); // Esto imprimirá el error completo y detallado.
+        throw ex;
     }
+    return lista;
+}
 
     /**
      * Busca un vehículo por ID.
