@@ -56,7 +56,7 @@
 <body>
 
 <div class="container">
-    <h1>Gestión de Garaje Holaaaaa</h1>
+    <h1>Gestión de Garaje</h1>
 
     <%-- Sección para mostrar mensajes de error o éxito --%>
     <c:if test="${not empty error}">
