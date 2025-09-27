@@ -131,9 +131,9 @@ public class VehiculoFacade {
                 throw new BusinessException("No se puede eliminar porque el vehículo con ID " + id + " no existe.");
             }
 
-            // Regla: No se puede eliminar un vehículo si el propietario es "Administrador"[cite: 333].
+            // Regla: No se puede eliminar un vehículo si el propietario es "Administrador"
             if ("Administrador".equalsIgnoreCase(vehiculoAEliminar.getPropietario())) {
-                throw new BusinessException("No está permitido eliminar un vehículo que pertenece al 'Administrador'.");
+                throw new BusinessException("No se puede eliminar vehiculo de 'Administrador'.");
             }
 
             dao.eliminar(id);
