@@ -18,7 +18,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Garaje HOLA jenny</title>
+    <title>Gestión de Garaje HOLA jeimy</title>
     
     <style>
         body { font-family: sans-serif; background-color: #f9f9f9; padding: 15px; }
