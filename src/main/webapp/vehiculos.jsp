@@ -3,8 +3,8 @@
 <%@ page import="com.garaje.model.Vehiculo" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 
-<%-- Se recuperan los datos que el Servlet ha colocado en el request --%>
 <%
+    // Se recuperan los datos enviados desde el Servlet
     String error = (String) request.getAttribute("error");
     String success = (String) request.getAttribute("success");
     List<Vehiculo> vehiculos = (List<Vehiculo>) request.getAttribute("vehiculos");
@@ -18,8 +18,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Garaje HOLA jeimy</title>
-    
+    <title>Gestión de Garaje</title>
     <style>
         body { font-family: sans-serif; background-color: #f9f9f9; padding: 15px; }
         .container { max-width: 800px; margin: auto; background: #fff; border: 1px solid #ccc; padding: 20px; }
@@ -30,7 +29,7 @@
             width: 100%;
             padding: 8px;
             border: 1px solid #ccc;
-            box-sizing: border-box; /* Asegura que el padding no afecte el ancho total */
+            box-sizing: border-box;
         }
         .btn {
             padding: 10px 15px; border: none; font-size: 16px;
@@ -58,7 +57,7 @@
 <div class="container">
     <h1>Gestión de Garaje</h1>
 
-    <%-- Sección para mostrar mensajes de error o éxito --%>
+    <!-- Mensajes de error o éxito -->
     <c:if test="${not empty error}">
         <div class="alert alert-danger">${error}</div>
     </c:if>
@@ -71,32 +70,26 @@
         
         <form action="vehiculos" method="post">
             
+            <!-- Acción: add o update -->
             <input type="hidden" name="action" value="<%= modoEdicion ? "update" : "add" %>">
             
-            <c:if test="${modoEdicion}">
-                <input type="hidden" name="id" value="${vehiculoSeleccionado.id}">
-            </c:if>
+            <!-- ID oculto solo si es actualización -->
+            <% if (modoEdicion) { %>
+                <input type="hidden" name="id" value="<%= vehiculoSeleccionado.getId() %>">
+            <% } %>
 
             <div class="form-grid">
                 <div class="form-group">
                     <label for="placa">Placa</label>
-                    <input type="text" id="placa" name="placa" value="${modoEdicion ? vehiculoSeleccionado.placa : ''}" required minlength="3">
+                    <input type="text" id="placa" name="placa" value="<%= modoEdicion ? vehiculoSeleccionado.getPlaca() : "" %>" required minlength="3">
                 </div>
                 <div class="form-group">
                     <label for="marca">Marca</label>
-                    <input type="text" id="marca" name="marca" value="${modoEdicion ? vehiculoSeleccionado.marca : ''}" required minlength="3">
+                    <input type="text" id="marca" name="marca" value="<%= modoEdicion ? vehiculoSeleccionado.getMarca() : "" %>" required minlength="3">
                 </div>
                 <div class="form-group">
                     <label for="modelo">Modelo (Año)</label>
-                    <%-- Se usa c:choose para generar el HTML limpio y evitar errores de validación del IDE --%>
-                    <c:choose>
-                        <c:when test="${modoEdicion}">
-                            <input type="number" id="modelo" name="modelo" value="${vehiculoSeleccionado.modelo}" required placeholder="Ej: 2023">
-                        </c:when>
-                        <c:otherwise>
-                            <input type="number" id="modelo" name="modelo" required placeholder="Ej: 2023">
-                        </c:otherwise>
-                    </c:choose>
+                    <input type="number" id="modelo" name="modelo" value="<%= modoEdicion ? vehiculoSeleccionado.getModelo() : "" %>" required placeholder="Ej: 2023">
                 </div>
                 <div class="form-group">
                     <label for="color">Color</label>
@@ -112,14 +105,14 @@
                 </div>
                 <div class="form-group">
                     <label for="propietario">Propietario</label>
-                    <input type="text" id="propietario" name="propietario" value="${modoEdicion ? vehiculoSeleccionado.propietario : ''}" required minlength="5">
+                    <input type="text" id="propietario" name="propietario" value="<%= modoEdicion ? vehiculoSeleccionado.getPropietario() : "" %>" required minlength="5">
                 </div>
             </div>
 
             <div class="form-actions">
-                <c:if test="${modoEdicion}">
+                <% if (modoEdicion) { %>
                     <a href="vehiculos" class="btn btn-secondary">Cancelar</a>
-                </c:if>
+                <% } %>
                 <button type="submit" class="btn <%= modoEdicion ? "btn-success" : "btn-primary" %>">
                     <%= modoEdicion ? "Actualizar Vehículo" : "Agregar Vehículo" %>
                 </button>

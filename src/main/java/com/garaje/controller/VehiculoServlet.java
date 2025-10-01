@@ -9,11 +9,10 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.sql.SQLException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @WebServlet("/vehiculos")
 public class VehiculoServlet extends HttpServlet {
@@ -21,59 +20,62 @@ public class VehiculoServlet extends HttpServlet {
     @EJB
     private VehiculoFacade vehiculoFacade;
 
-    /**
-     * Maneja las peticiones GET. Se encarga de mostrar la lista de vehículos
-     * y el formulario de edición.
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+
         String action = request.getParameter("action");
+        HttpSession session = request.getSession();
 
         try {
-            // Acción para mostrar el formulario de edición
             if ("edit".equals(action)) {
                 String idParam = request.getParameter("id");
-                //  Se verifica que el ID no sea nulo o vacío
                 if (idParam != null && !idParam.isEmpty()) {
                     int id = Integer.parseInt(idParam);
                     Vehiculo vehiculo = vehiculoFacade.buscarPorId(id);
-                    //  Se verifica que el vehículo exista
                     if (vehiculo != null) {
                         request.setAttribute("vehiculoSeleccionado", vehiculo);
                     } else {
-                        request.setAttribute("error", "Error: No se encontró un vehículo con el ID " + id);
+                        request.setAttribute("error", "No se encontró un vehículo con ID " + id);
                     }
                 } else {
-                    request.setAttribute("error", "Error: El ID del vehículo es inválido para la edición.");
+                    request.setAttribute("error", "El ID del vehículo es inválido para editar.");
                 }
-            } 
-            // Acción para eliminar un vehículo
-            else if ("delete".equals(action)) {
+            } else if ("delete".equals(action)) {
                 int id = Integer.parseInt(request.getParameter("id"));
                 vehiculoFacade.eliminar(id);
-                request.setAttribute("success", "Vehículo eliminado con éxito.");
+                session.setAttribute("success", "Vehículo eliminado con éxito.");
+                response.sendRedirect(request.getContextPath() + "/vehiculos");
+                return;
             }
-            
-            // Al final, siempre se recarga la lista de vehículos
+
+            // Pasar mensajes de session -> request y limpiarlos
+            if (session.getAttribute("success") != null) {
+                request.setAttribute("success", session.getAttribute("success"));
+                session.removeAttribute("success");
+            }
+            if (session.getAttribute("error") != null) {
+                request.setAttribute("error", session.getAttribute("error"));
+                session.removeAttribute("error");
+            }
+
+            // Siempre refrescar lista
             List<Vehiculo> vehiculos = vehiculoFacade.listar();
             request.setAttribute("vehiculos", vehiculos);
 
         } catch (SQLException | BusinessException | NumberFormatException e) {
             request.setAttribute("error", "Error: " + e.getMessage());
         }
-        
+
         request.getRequestDispatcher("/vehiculos.jsp").forward(request, response);
     }
 
-    /**
-     * Maneja las peticiones POST para agregar o actualizar un vehículo.
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
+
         String action = request.getParameter("action");
+        HttpSession session = request.getSession();
 
         try {
             String placa = request.getParameter("placa");
@@ -91,27 +93,29 @@ public class VehiculoServlet extends HttpServlet {
 
             if ("add".equals(action)) {
                 vehiculoFacade.agregar(vehiculo);
-                request.setAttribute("success", "¡Vehículo agregado con éxito!");
+
+                if ("Ferrari".equalsIgnoreCase(marca)) {
+                    session.setAttribute("success",
+                        "¡Vehículo agregado con éxito! 🚨 Notificación: Se registró un Ferrari con placa " + placa);
+                } else {
+                    session.setAttribute("success", "¡Vehículo agregado con éxito!");
+                }
+
             } else if ("update".equals(action)) {
                 int id = Integer.parseInt(request.getParameter("id"));
                 vehiculo.setId(id);
                 vehiculoFacade.actualizar(vehiculo);
-                request.setAttribute("success", "¡Vehículo actualizado con éxito!");
+                session.setAttribute("success", "¡Vehículo actualizado con éxito!");
             }
 
-        } catch (SQLException | BusinessException e) {
-            request.setAttribute("error", "Error al procesar: " + e.getMessage());
-            try {
-                // ** Si hay un error, se conservan los datos ingresados en el formulario
-                request.setAttribute("vehiculoSeleccionado", request.getParameter("id") != null ? vehiculoFacade.buscarPorId(Integer.parseInt(request.getParameter("id"))) : null);
-            } catch (SQLException ex) {
-                Logger.getLogger(VehiculoServlet.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            response.sendRedirect(request.getContextPath() + "/vehiculos");
+
+        } catch (BusinessException | SQLException e) {
+            session.setAttribute("error", e.getMessage());
+            response.sendRedirect(request.getContextPath() + "/vehiculos");
         } catch (Exception e) {
-            request.setAttribute("error", "Ocurrió un error inesperado: " + e.getMessage());
+            session.setAttribute("error", "Ocurrió un error inesperado: " + e.getMessage());
+            response.sendRedirect(request.getContextPath() + "/vehiculos");
         }
-        
-        // Se llama a doGet para recargar la página con la lista actualizada y los mensajes.
-        response.sendRedirect(request.getContextPath() + "/vehiculos");
     }
 }
